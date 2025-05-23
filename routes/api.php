@@ -7,12 +7,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 #Users
+Route::get('/user', function(Request $request){
+    return $request->user();
+})->middleware('auth:sanctum');
+
 Route::get('/users', [UsersController::class, 'index']);
-// Route::post('/register', [UsersController::class, 'register']);
-// Route::post('/login', [UsersController::class, 'login']);
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
+#Recipes
 Route::apiResource('recipes', RecipesController::class);

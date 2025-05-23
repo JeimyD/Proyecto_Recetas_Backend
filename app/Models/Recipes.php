@@ -22,4 +22,8 @@ class Recipes extends Model
     public function user(){
         return $this->belongsTo(Users::class);
     }
+
+    public function recipe_laber(){
+        return $this->hasMany(Recipe_Label::class);
+    }
 }

@@ -46,8 +46,10 @@ class AuthController extends Controller
         $token = $user->createToken($user->name);
 
         return response()->json([
+            'message' => 'conexion existosa',
             'user' => $user,
-            'token' => $token->plainTextToken
+            'token' => $token->plainTextToken,
+            'status' => 200
         ], 200);
     }
 

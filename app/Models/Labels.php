@@ -17,4 +17,8 @@ class Labels extends Model
         'created_at',
         'updated_at'
     ];
+
+    public function recipe_label(){
+        return $this->hasMany(Recipe_Label::class);
+    }
 }
