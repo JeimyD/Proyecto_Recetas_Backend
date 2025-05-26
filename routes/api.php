@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\RecipesController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
@@ -19,3 +20,6 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 
 #Recipes
 Route::apiResource('recipes', RecipesController::class);
+
+#Ingredients
+Route::post('/ingredients', [IngredientController::class, 'store']);

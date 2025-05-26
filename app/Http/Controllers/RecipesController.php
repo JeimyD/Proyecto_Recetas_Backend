@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Recipe;
 use App\Models\Recipes;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class RecipesController extends Controller
 {
@@ -23,20 +25,26 @@ class RecipesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Recipe $request)
     {
-        $data = $request->validate([
-            'tittle' => ['required', 'max:500'],
-            'image' => ['required', 'max:200'],
-            'video' => ['required', 'max:300'],
-            'description' => ['required'],
-            'instructions' => ['required'],
-            'preparation_time' => ['required'],
-        ]);
+        $data = $request->validated();
 
-        $recipe = $request->user()->recipes()->create($data);
+        $data['users_id'] = auth()->id;
 
-        return $recipe;
+        $recipe = Recipe::create($data);
+
+        foreach ($data['ingredients'] as $ingredient) {
+        $recipe->ingredients()->attach(
+            $ingredient['id'],
+            [
+                'quantity_2' => $ingredient['quantity_2'] ?? null,
+                'quantity_4' => $ingredient['quantity_4'] ?? null,
+                'quantity_8' => $ingredient['quantity_8'] ?? null,
+            ]
+        );
+
+        return new Recipe($recipe->load(['ingredients', 'ratings.user']));
+    }
     }
 
     /**
