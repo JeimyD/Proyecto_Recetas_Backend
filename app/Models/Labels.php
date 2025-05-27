@@ -21,4 +21,9 @@ class Labels extends Model
     public function recipe_label(){
         return $this->hasMany(Recipe_Label::class);
     }
+
+    public function recipes()
+    {
+        return $this->belongsToMany(Recipes::class, 'recipe_label', 'label_id', 'recipe_id');
+    }
 }

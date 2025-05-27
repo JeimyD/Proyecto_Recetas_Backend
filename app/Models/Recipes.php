@@ -38,4 +38,8 @@ class Recipes extends Model
     {
         return $this->hasMany(Rating::class, 'recipes_id')->whereNotNull('comment');
     }
+
+    public function labels(){
+        return $this->hasMany(Recipe_Label::class, 'recipe_label');
+    }
 }

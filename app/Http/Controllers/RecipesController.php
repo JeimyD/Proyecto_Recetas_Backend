@@ -9,21 +9,46 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
+use function PHPUnit\Framework\isEmpty;
+
 class RecipesController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth:sanctum')->except(['index', 'show']);
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $recipes = Recipes::with('ingredients')->get();
+        $search = request()->get('search');
+        $query = Recipes::with(['ingredients']);
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('tittle', 'LIKE', '%' . $search . '%')
+                    ->orWhere('description', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        $recipes = $query->get();
+
+        if ($recipes->isEmpty()) {
+            $data = [
+                'message' => $search ? 'No se encontraron recetas que coincidan con: ' . $search : 'No se encontraron recetas',
+                'status' => 404,
+                'search_term' => $search
+            ];
+            return response()->json($data, 404);
+        }
 
         return response()->json([
             'data' => $recipes,
+            'total' => $recipes->count(),
+            'search_term' => $search,
+            'status' => 200
         ], 200);
     }
 
@@ -86,9 +111,21 @@ class RecipesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request)
+    public function show(string $id)
     {
-        return $request;
+        $recipes = Recipes::with('ingredients')->get()->find($id);
+
+        if (!$recipes) {
+            $data = [
+                'message' => 'Receta no encontrada',
+                'status' => 404
+            ];
+            return response()->json($data, 404);
+        }
+
+        return response()->json([
+            'data' => $recipes,
+        ], 200);
     }
 
     /**

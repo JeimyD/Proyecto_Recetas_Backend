@@ -23,8 +23,10 @@ class AuthController extends Controller
         $token = $user->createToken($request->name);
 
         return response()->json([
+            'message' => 'Credenciales creadas',
             'user' => $user,
-            'token' => $token->plainTextToken
+            'token' => $token->plainTextToken,
+            'status' => 200
         ], 200);
     }
 
