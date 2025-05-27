@@ -21,5 +21,3 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 #Recipes
 Route::apiResource('recipes', RecipesController::class);
 
-#Ingredients
-Route::post('/ingredients', [IngredientController::class, 'store']);

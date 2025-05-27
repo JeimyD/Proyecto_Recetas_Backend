@@ -7,6 +7,7 @@ use App\Models\Recipes;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class RecipesController extends Controller
 {
@@ -19,40 +20,75 @@ class RecipesController extends Controller
      */
     public function index()
     {
-        return Recipes::all();
+        $recipes = Recipes::with('ingredients')->get();
+
+        return response()->json([
+            'data' => $recipes,
+        ], 200);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Recipe $request)
+    public function store(Request $request)
     {
-        $data = $request->validated();
+        $validator = Validator::make($request->all(), [
+            'tittle' => 'required|string|max:255',
+            'image' => 'nullable|string',
+            'video' => 'nullable|string',
+            'description' => 'required|string',
+            'instructions' => 'required|string',
+            'preparation_time' => 'required|integer',
+            'quantity_2' => 'nullable',
+            'quantity_4' => 'nullable',
+            'quantity_8' => 'nullable',
+        ]);
 
-        $data['users_id'] = auth()->id;
+        $user = $request->user();
 
-        $recipe = Recipe::create($data);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Error en la validacion de datos',
+                'errors' => $validator->errors(),
+                'status' => 400
+            ], 400);
+        }
 
-        foreach ($data['ingredients'] as $ingredient) {
-        $recipe->ingredients()->attach(
-            $ingredient['id'],
-            [
-                'quantity_2' => $ingredient['quantity_2'] ?? null,
-                'quantity_4' => $ingredient['quantity_4'] ?? null,
-                'quantity_8' => $ingredient['quantity_8'] ?? null,
-            ]
-        );
+        $recipes = Recipes::create([
+            'tittle' => $request->tittle,
+            'image' => $request->image,
+            'video' => $request->video,
+            'description' => $request->description,
+            'instructions' => $request->instructions,
+            'preparation_time' => $request->preparation_time,
+            'users_id' => $user->id,
+        ]);
 
-        return new Recipe($recipe->load(['ingredients', 'ratings.user']));
-    }
+        $recipes->ingredients()->create([
+            'quantity_2' => $request->quantity_2,
+            'quantity_4' => $request->quantity_4,
+            'quantity_8' => $request->quantity_8,
+        ]);
+
+        if (!$recipes) {
+            return response()->json([
+                'message' => 'Error al registrar receta',
+                'status' => 500
+            ], 500);
+        }
+
+        return response()->json([
+            'message' => $recipes,
+            'status' => 201
+        ], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Recipes $recipe)
+    public function show(Request $request)
     {
-        return $recipe;
+        return $request;
     }
 
     /**
