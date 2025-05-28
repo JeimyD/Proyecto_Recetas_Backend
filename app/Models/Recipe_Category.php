@@ -4,13 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Recipe_Label extends Model
+class Recipe_Category extends Model
 {
-    protected $table = 'recipe_label';
+    protected $table = 'recipe_category';
 
     protected $fillable = [
         'recipes_id',
-        'labels_id'
+        'categories_id'
     ];
 
     public function recipe()
@@ -20,6 +20,6 @@ class Recipe_Label extends Model
 
     public function label()
     {
-        return $this->belongsTo(Labels::class, 'labels_id');
+        return $this->belongsTo(Categories::class, 'categories_id');
     }
 }

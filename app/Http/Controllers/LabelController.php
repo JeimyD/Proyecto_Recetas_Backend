@@ -23,7 +23,6 @@ class LabelController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:50',
-            'icon' => 'required'
         ]);
 
         if ($validator -> fails()) {
@@ -38,7 +37,6 @@ class LabelController extends Controller
 
         $label = Labels::Create([
             'name' => $request->name,
-            'icon' => $request->icon
         ]);
 
         if (!$label){

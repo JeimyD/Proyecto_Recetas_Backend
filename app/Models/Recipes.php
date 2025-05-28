@@ -20,7 +20,8 @@ class Recipes extends Model
         'users_id'
     ];
 
-    public function ingredients(){
+    public function ingredients()
+    {
         return $this->hasMany(RecipeIngredients::class, 'recipes_id');
     }
 
@@ -39,7 +40,13 @@ class Recipes extends Model
         return $this->hasMany(Rating::class, 'recipes_id')->whereNotNull('comment');
     }
 
-    public function labels(){
-        return $this->hasMany(Recipe_Label::class, 'recipe_label');
+    public function labels()
+    {
+        return $this->belongsToMany(Labels::class, 'recipe_label', 'recipes_id', 'labels_id');
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Categories::class, 'recipe_category', 'recipe_id', 'categories_id');
     }
 }

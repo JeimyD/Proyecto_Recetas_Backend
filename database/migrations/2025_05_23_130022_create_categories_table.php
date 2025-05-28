@@ -16,8 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->text('description');
             $table->string('icon');
-            $table->foreignId('recipes_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('recipe_label_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\IngredientController;
+use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\RecipesController;
 use App\Http\Controllers\UsersController;
@@ -28,3 +28,11 @@ Route::delete('/recipes/{id}', [RecipesController::class, 'destroy']);
 
 #Labels
 Route::apiResource('labels', LabelController::class);
+
+#Categories
+Route::get('/categories', [CategoriesController::class, 'index']);
+Route::post('/categories', [CategoriesController::class, 'store'])->middleware('auth:sanctum');
+Route::get('/categories/{id}', [CategoriesController::class, 'show']);
+Route::put('/categories/{id}', [CategoriesController::class, 'update'])->middleware('auth:sanctum');
+Route::delete('/categories/{id}', [CategoriesController::class, 'destroy'])->middleware('auth:sanctum');
+Route::get('/categories/{id}/recipes', [CategoriesController::class, 'recipes']);
