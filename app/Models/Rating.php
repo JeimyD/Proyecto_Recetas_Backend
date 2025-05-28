@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Rating extends Model
 {
+    protected $table = 'rating';
+
     protected $fillable = [
         'recipes_id',
         'users_id',
@@ -16,5 +18,10 @@ class Rating extends Model
     public function user()
     {
         return $this->belongsTo(Users::class, 'users_id');
+    }
+
+    public function recipe()
+    {
+        return $this->belongsTo(Recipes::class, 'recipes_id');
     }
 }

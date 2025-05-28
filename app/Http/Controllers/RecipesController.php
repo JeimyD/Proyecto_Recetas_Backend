@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Recipe;
 use App\Models\Categories;
 use App\Models\Labels;
+use App\Models\Rating;
 use App\Models\Recipe_Label;
 use App\Models\Recipes;
 use Illuminate\Http\Request;
@@ -18,13 +19,75 @@ class RecipesController extends Controller
         $this->middleware('auth:sanctum')->except(['index', 'show']);
     }
 
+    public function addRating(Request $request, $id)
+    {
+        $recipe = Recipes::find($id);
+
+        if (!$recipe) {
+            return response()->json([
+                'message' => 'Receta no encontrada',
+                'status' => 404
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'rate' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:500'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Error en la validación',
+                'errors' => $validator->errors(),
+                'status' => 400
+            ], 400);
+        }
+
+        $user = $request->user();
+
+        $existingRating = Rating::where('recipes_id', $id)
+            ->where('users_id', $user->id)
+            ->first();
+
+        if ($existingRating) {
+            $existingRating->update([
+                'rate' => $request->rate,
+                'comment' => $request->comment
+            ]);
+            $rating = $existingRating;
+            $message = 'Rating actualizado exitosamente';
+        } else {
+            $rating = Rating::create([
+                'recipes_id' => $id,
+                'users_id' => $user->id,
+                'rate' => $request->rate,
+                'comment' => $request->comment
+            ]);
+            $message = 'Rating agregado exitosamente';
+        }
+
+        $rating->load('user');
+
+        return response()->json([
+            'message' => $message,
+            'data' => [
+                'id' => $rating->id,
+                'user_name' => $rating->user->name,
+                'comment' => $rating->comment,
+                'rate' => $rating->rate,
+                'created_at' => $rating->created_at
+            ],
+            'status' => 201
+        ], 201);
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         $search = request()->get('search');
-        $query = Recipes::with(['ingredients', 'labels', 'categories']);
+        $query = Recipes::with(['ingredients', 'labels', 'categories', 'ratings']);
 
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
@@ -62,6 +125,8 @@ class RecipesController extends Controller
                 'categories' => $recipe->categories->pluck('name')->toArray(),
                 'ingredients' => $recipe->ingredients,
                 'labels' => $recipe->labels->pluck('name')->toArray(),
+                'average_rating' => round($recipe->average_rating, 1),
+                'total_ratings' => $recipe->total_ratings,
                 'created_at' => $recipe->created_at,
                 'updated_at' => $recipe->updated_at
             ];
@@ -181,7 +246,7 @@ class RecipesController extends Controller
      */
     public function show(string $id)
     {
-        $recipe = Recipes::with(['ingredients', 'labels', 'categories'])->find($id);
+        $recipe = Recipes::with(['ingredients', 'labels', 'categories', 'rating.user'])->find($id);
 
         if (!$recipe) {
             $data = [
@@ -202,6 +267,17 @@ class RecipesController extends Controller
             'categories' => $recipe->categories->pluck('name')->toArray(),
             'ingredients' => $recipe->ingredients,
             'labels' => $recipe->labels->pluck('name')->toArray(),
+            'average_rating' => round($recipe->average_rating, 1),
+            'total_ratings' => $recipe->total_ratings,
+            'comments' => $recipe->rating->map(function ($rating) {
+                return [
+                    'id' => $rating->id,
+                    'user_name' => $rating->user->name,
+                    'comment' => $rating->comment,
+                    'rate' => $rating->rate,
+                    'created_at' => $rating->created_at
+                ];
+            }),
             'created_at' => $recipe->created_at,
             'updated_at' => $recipe->updated_at
         ];

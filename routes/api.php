@@ -25,6 +25,7 @@ Route::get('/recipes/{id}', [RecipesController::class, 'show']);
 Route::post('/recipes', [RecipesController::class, 'store']);
 Route::put('/recipes/{id}', [RecipesController::class, 'update']);
 Route::delete('/recipes/{id}', [RecipesController::class, 'destroy']);
+Route::post('/recipes/{id}/rating', [RecipesController::class, 'addRating']);
 
 #Labels
 Route::apiResource('labels', LabelController::class);

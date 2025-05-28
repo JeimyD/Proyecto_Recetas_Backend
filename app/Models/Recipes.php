@@ -30,9 +30,19 @@ class Recipes extends Model
         return $this->belongsTo(Users::class, 'users_id')->getColums();
     }
 
-    public function ratings()
+    public function rating()
     {
         return $this->hasMany(Rating::class, 'recipes_id');
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return $this->rating()->avg('rate') ?? 0;
+    }
+
+    public function getTotalRatingsAttribute()
+    {
+        return $this->rating()->count();
     }
 
     public function comments()
