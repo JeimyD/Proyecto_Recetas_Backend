@@ -31,7 +31,7 @@ class RecipesController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'rate' => 'required|integer|min:1|max:5',
+            'rate' => 'required|min:1|max:5',
             'comment' => 'nullable|string|max:500'
         ]);
 

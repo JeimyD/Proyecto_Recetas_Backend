@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\FavoritesController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\RecipesController;
 use App\Http\Controllers\UsersController;
@@ -37,3 +38,13 @@ Route::get('/categories/{id}', [CategoriesController::class, 'show']);
 Route::put('/categories/{id}', [CategoriesController::class, 'update'])->middleware('auth:sanctum');
 Route::delete('/categories/{id}', [CategoriesController::class, 'destroy'])->middleware('auth:sanctum');
 Route::get('/categories/{id}/recipes', [CategoriesController::class, 'recipes']);
+
+
+#Favorites
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/favorites', [FavoritesController::class, 'index']);
+    Route::post('/recipes/{recipeId}/favorite', [FavoritesController::class, 'store']);
+    Route::delete('/recipes/{recipeId}/favorite', [FavoritesController::class, 'destroy']);
+    Route::post('/recipes/{recipeId}/toggle-favorite', [FavoritesController::class, 'update']);
+    Route::get('/recipes/{recipeId}/is-favorite', [FavoritesController::class, 'checkFavorite']);
+});

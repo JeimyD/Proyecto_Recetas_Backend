@@ -22,4 +22,9 @@ class Categories extends Model
     public function recipe_label(){
         return $this->hasMany(Recipe_Category::class);
     }
+
+    public function recipes()
+    {
+        return $this->belongsToMany(Recipes::class, 'recipe_category', 'categories_id', 'recipe_id');
+    }
 }

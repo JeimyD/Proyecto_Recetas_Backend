@@ -59,4 +59,25 @@ class Recipes extends Model
     {
         return $this->belongsToMany(Categories::class, 'recipe_category', 'recipe_id', 'categories_id');
     }
+
+    public function favoritedBy()
+    {
+        return $this->belongsToMany(Users::class, 'favorites', 'recipes_id', 'users_id')
+            ->withTimestamps();
+    }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorites::class, 'recipes_id');
+    }
+
+    public function getTotalFavoritesAttribute()
+    {
+        return $this->favorites()->count();
+    }
+
+    public function isFavoritedBy($userId)
+    {
+        return $this->favoritedBy()->where('users.id', $userId)->exists();
+    }
 }

@@ -24,7 +24,24 @@ class Users extends Model
         'updated_at'
     ];
 
-    public function recipes(){
+    public function recipes()
+    {
         return $this->hasMany(Recipes::class);
+    }
+
+    public function favoriteRecipes()
+    {
+        return $this->belongsToMany(Recipes::class, 'favorites', 'users_id', 'recipes_id')
+            ->withTimestamps();
+    }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorites::class, 'users_id');
+    }
+
+    public function hasFavorite($recipeId)
+    {
+        return $this->favoriteRecipes()->where('recipes.id', $recipeId)->exists();
     }
 }
