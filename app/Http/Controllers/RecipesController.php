@@ -87,7 +87,7 @@ class RecipesController extends Controller
     public function index()
     {
         $search = request()->get('search');
-        $query = Recipes::with(['ingredients', 'labels', 'categories', 'ratings']);
+        $query = Recipes::with(['ingredients', 'labels', 'categories', 'rating']);
 
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
